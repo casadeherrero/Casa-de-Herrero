@@ -9,7 +9,7 @@
    Mientras diga 'PEGAR_CLIENT_ID_ACA', la app funciona igual
    pero el botón de Google Drive va a avisar que falta configurar.
    ============================================================ */
-const GOOGLE_CLIENT_ID = 'PEGAR_CLIENT_ID_ACA.apps.googleusercontent.com';
+const GOOGLE_CLIENT_ID = '1063528493037-dr7o3b8uiekadlpm80g8obpdqihc0oev.apps.googleusercontent.com';
 const GOOGLE_DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.appdata';
 const GOOGLE_DRIVE_FILENAME = 'cdh_gestion_db.json';
 
