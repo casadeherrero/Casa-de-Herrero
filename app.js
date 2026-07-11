@@ -22,8 +22,6 @@ const ESTADOS_PEDIDO = [
   'Confirmado sin seña',
   'Confirmado con seña',
   'Confirmado con pago total',
-  'En proceso',
-  'Listo para entrega',
   'Entregado',
   'Cancelado'
 ];
