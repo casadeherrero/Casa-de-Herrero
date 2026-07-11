@@ -128,6 +128,10 @@ input,select,textarea{ font-family: var(--font-body); }
 .drive-pill svg{ width:15px; height:15px; flex-shrink:0; }
 .drive-pill:hover{ background: rgba(244,239,228,.1); color:#fff; }
 .drive-pill.on{ background: rgba(85,112,63,.25); border-color: rgba(127,165,99,.4); color: #d8e6cc; }
+.drive-pill.busy{ background: rgba(184,150,90,.22); border-color: rgba(184,150,90,.4); color: #ecd9ae; }
+.drive-pill.busy svg{ animation: driveSpin 1.1s linear infinite; }
+.drive-pill.err{ background: rgba(156,58,43,.22); border-color: rgba(156,58,43,.45); color: #f0c6bb; }
+@keyframes driveSpin{ from{ transform:rotate(0);} to{ transform:rotate(360deg);} }
 
 .sidebar-footer{
   padding: 14px 20px 18px;
@@ -388,3 +392,4 @@ td.num, th.num{ text-align:right; font-family: var(--font-mono); }
 ::-webkit-scrollbar{ width:9px; height:9px; }
 ::-webkit-scrollbar-thumb{ background:#d9cdb8; border-radius:10px; }
 ::-webkit-scrollbar-track{ background:transparent; }
+
