@@ -160,7 +160,7 @@ function loadDB(){
 function saveDB(db){ localStorage.setItem(DB_KEY, JSON.stringify(db)); }
 
 let DB = loadDB();
-function persist(){ saveDB(DB); syncClientesFromPedidos(); saveDB(DB); }
+function persist(){ saveDB(DB); syncClientesFromPedidos(); saveDB(DB); scheduleDriveAutoSave(); }
 
 /* ------------------------- reglas de negocio ---------------------------- */
 
@@ -1419,8 +1419,12 @@ let gisInited = false;
 let tokenClient = null;
 let driveAccessToken = null;
 let driveFileId = null;
+let driveSyncState = 'idle'; // idle | saving | saved | error
+let driveAutoSaveTimer = null;
+let driveLastSyncTime = null;
 
 const DRIVE_FLAG_KEY = 'cdh_drive_was_connected';
+const DRIVE_AUTOSAVE_DELAY = 1800;
 
 function driveConfigured(){
   return GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID.indexOf('PEGAR_CLIENT_ID_ACA') === -1;
@@ -1491,8 +1495,10 @@ async function driveFindFile(){
   return files[0] || null;
 }
 
-async function driveSave(){
-  if(!driveAccessToken){ showToast('Conectá Google Drive primero'); return; }
+async function driveSave(silent){
+  if(!driveAccessToken){ if(!silent) showToast('Conectá Google Drive primero'); return; }
+  driveSyncState = 'saving';
+  renderDriveStatus();
   try{
     const existing = await driveFindFile();
     const content = JSON.stringify(DB);
@@ -1515,12 +1521,24 @@ async function driveSave(){
     if(!resp.ok) throw new Error('HTTP ' + resp.status);
     const data = await resp.json();
     driveFileId = data.id;
-    showToast('Datos guardados en Google Drive');
+    driveSyncState = 'saved';
+    driveLastSyncTime = new Date();
+    if(!silent) showToast('Datos guardados en Google Drive');
     renderDriveStatus();
   }catch(e){
     console.error(e);
-    showToast('Error al guardar en Google Drive');
+    driveSyncState = 'error';
+    if(!silent) showToast('Error al guardar en Google Drive');
+    renderDriveStatus();
   }
+}
+
+function scheduleDriveAutoSave(){
+  if(!driveAccessToken) return;
+  driveSyncState = 'pending';
+  renderDriveStatus();
+  clearTimeout(driveAutoSaveTimer);
+  driveAutoSaveTimer = setTimeout(()=> driveSave(true), DRIVE_AUTOSAVE_DELAY);
 }
 
 async function driveLoadConfirm(){
@@ -1537,6 +1555,8 @@ async function driveLoad(){
     DB = remote;
     saveDB(DB);
     driveFileId = existing.id;
+    driveSyncState = 'saved';
+    driveLastSyncTime = new Date();
     render();
     showToast('Datos cargados desde Google Drive');
   }catch(e){
@@ -1545,14 +1565,28 @@ async function driveLoad(){
   }
 }
 
+function driveSyncLabel(){
+  if(!driveConfigured()) return 'Google Drive (sin configurar)';
+  if(!driveAccessToken) return 'Conectar Google Drive';
+  switch(driveSyncState){
+    case 'saving': return 'Guardando en Drive...';
+    case 'pending': return 'Cambios sin guardar...';
+    case 'error': return 'Error al sincronizar';
+    case 'saved': return driveLastSyncTime ? `Sincronizado ${driveLastSyncTime.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}` : 'Sincronizado';
+    default: return 'Google Drive conectado';
+  }
+}
+
 function renderDriveStatus(){
   const el = document.getElementById('driveStatusBtn');
   if(!el) return;
   const connected = !!driveAccessToken;
+  const busy = driveSyncState === 'saving' || driveSyncState === 'pending';
+  const hasError = driveSyncState === 'error';
   el.innerHTML = `
-    <div class="drive-pill ${connected?'on':''}" id="driveOpenBtn">
+    <div class="drive-pill ${connected?'on':''} ${busy?'busy':''} ${hasError?'err':''}" id="driveOpenBtn">
       ${ICON.cloud}
-      <span>${!driveConfigured() ? 'Google Drive (sin configurar)' : connected ? 'Google Drive conectado' : 'Conectar Google Drive'}</span>
+      <span>${driveSyncLabel()}</span>
     </div>`;
   el.querySelector('#driveOpenBtn').onclick = openDriveModal;
 }
@@ -1565,19 +1599,21 @@ function openDriveModal(){
       <div class="icon-badge" style="background:${connected?'var(--success-bg)':'var(--parchment-2)'};color:${connected?'var(--success)':'var(--rust)'};">${ICON.cloud}</div>
       <div>
         <strong>${connected ? 'Conectado a Google Drive' : configured ? 'No conectado' : 'Falta configurar'}</strong>
-        <div class="timeline-hint">${connected ? 'Tus datos se pueden guardar y traer desde tu Google Drive.' : configured ? 'Conectá tu cuenta de Google para sincronizar entre dispositivos.' : 'Todavía falta pegar el Client ID de Google en app.js (ver guía).'}</div>
+        <div class="timeline-hint">${connected ? 'Guardado automático activado — cada cambio se sube solo, unos segundos después de hacerlo.' : configured ? 'Conectá tu cuenta de Google para sincronizar entre dispositivos.' : 'Todavía falta pegar el Client ID de Google en app.js (ver guía).'}</div>
       </div>
     </div>
     <p style="font-size:12.5px;color:var(--text-dim);line-height:1.6;">
       Los datos se guardan como un único archivo privado en tu Drive, dentro de una carpeta especial de la app
-      (no se mezcla con tus archivos ni carpetas normales). Podés usar esto en varios dispositivos: conectá,
-      cargá los datos al abrir, y guardá cuando termines de cargar información.
+      (no se mezcla con tus archivos ni carpetas normales). Al abrir la app en otro dispositivo, tocá
+      "Cargar desde Drive" para traer lo último — después, cada cambio que hagas en ese dispositivo se va a
+      guardar solo.
     </p>
+    ${connected ? `<p style="font-size:12px;color:var(--text-faint);margin-top:8px;">Estado actual: <strong>${driveSyncLabel()}</strong></p>` : ''}
   `;
   const footer = !configured
     ? `<button class="btn btn-ghost" id="dmClose">Cerrar</button>`
     : connected
-      ? `<button class="btn btn-ghost" id="dmDisconnect">Desconectar</button><button class="btn btn-ghost" id="dmLoad">${ICON.download} Cargar desde Drive</button><button class="btn btn-primary" id="dmSave">${ICON.cloud} Guardar en Drive</button>`
+      ? `<button class="btn btn-ghost" id="dmDisconnect">Desconectar</button><button class="btn btn-ghost" id="dmLoad">${ICON.download} Cargar desde Drive</button><button class="btn btn-primary" id="dmSave">${ICON.cloud} Guardar ahora</button>`
       : `<button class="btn btn-ghost" id="dmClose">Cerrar</button><button class="btn btn-primary" id="dmConnect">Conectar con Google</button>`;
 
   openModal({
@@ -1588,7 +1624,7 @@ function openDriveModal(){
       const close = overlay.querySelector('#dmClose'); if(close) close.onclick = closeModal;
       const conn = overlay.querySelector('#dmConnect'); if(conn) conn.onclick = ()=>{ driveConnect(false); closeModal(); };
       const disc = overlay.querySelector('#dmDisconnect'); if(disc) disc.onclick = ()=>{ driveDisconnect(); closeModal(); };
-      const save = overlay.querySelector('#dmSave'); if(save) save.onclick = ()=>{ driveSave(); closeModal(); };
+      const save = overlay.querySelector('#dmSave'); if(save) save.onclick = ()=>{ driveSave(false); closeModal(); };
       const load = overlay.querySelector('#dmLoad'); if(load) load.onclick = ()=>{ closeModal(); driveLoadConfirm(); };
     }
   });
