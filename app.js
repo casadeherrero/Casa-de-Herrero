@@ -15,7 +15,7 @@ const GOOGLE_DRIVE_FILENAME = 'cdh_gestion_db.json';
 
 /* ----------------------------- constantes ----------------------------- */
 
-const ACCESORIOS = ['Parrilla','Ganchos','Utensilios largos','Brasero','Disco','Estaca'];
+const ACCESORIOS = ['Parrilla','Ganchos','Utensilios largos','Brasero','Disco','Estaca', 'Tabla adosada','Tapa para disco'];
 const FORMAS_PAGO = ['Efectivo','Transferencia','Mercado Pago','Tarjeta','QR'];
 const ENTREGA_TIPOS = ['Retira','Transporte'];
 const ESTADOS_PEDIDO = [
