@@ -348,7 +348,7 @@ function renderShell(){
   app.innerHTML = `
     <aside class="sidebar texture-iron">
       <div class="sidebar-brand">
-        <img src="assets/logo-light.png" alt="Casa de Herrero">
+        <img src="logo-light.png" alt="Casa de Herrero">
         <div>
           <div class="name">CASA DE HERRERO</div>
           <div class="tag">Gestión interna</div>
@@ -540,7 +540,7 @@ function renderDashboardPage(){
       </table>
     </div>
 
-    <div class="footer-brand"><img src="assets/logo-dark.png">Casa de Herrero — donde empieza lo bueno</div>
+    <div class="footer-brand"><img src="logo-dark.png">Casa de Herrero — donde empieza lo bueno</div>
   `;
 
   // gráfico flujo 6 meses
@@ -1073,7 +1073,7 @@ function renderBalancePage(){
         </tbody>
       </table>
     </div>
-    <div class="footer-brand"><img src="assets/logo-dark.png">Casa de Herrero — balance generado el ${fmtDate(todayISO())}</div>
+    <div class="footer-brand"><img src="logo-dark.png">Casa de Herrero — balance generado el ${fmtDate(todayISO())}</div>
   `;
   content.querySelector('#fBalanceMes').addEventListener('change', e=>{ f.balanceKey = e.target.value; renderBalancePage(); });
 }
@@ -1394,7 +1394,7 @@ function renderEstadisticasPage(){
       ${topLocalidades.map(([nombre,cant],i)=>`<div class="stat-line"><div class="name-row"><span class="rank">${i+1}</span>${escapeHtml(nombre)}</div><span class="val">${cant} pedido${cant!==1?'s':''}</span></div>`).join('') || '<p style="color:var(--text-faint);font-size:13px;">Sin datos.</p>'}
     </div>
 
-    <div class="footer-brand"><img src="assets/logo-dark.png">Casa de Herrero — estadísticas calculadas automáticamente sobre los datos cargados</div>
+    <div class="footer-brand"><img src="logo-dark.png">Casa de Herrero — estadísticas calculadas automáticamente sobre los datos cargados</div>
   `;
 }
 
