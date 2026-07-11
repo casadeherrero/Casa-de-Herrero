@@ -15,9 +15,9 @@ const GOOGLE_DRIVE_FILENAME = 'cdh_gestion_db.json';
 
 /* ----------------------------- constantes ----------------------------- */
 
-const ACCESORIOS = ['Parrilla','Ganchos','Utensilios largos','Brasero','Disco','Estaca', 'Tabla adosada','Tapa para disco'];
+const ACCESORIOS = ['Parrilla','Ganchos','Utensilios largos','Brasero','Leñero','Disco','Estaca', 'Tabla adosada','Tapa para disco'];
 const FORMAS_PAGO = ['Efectivo','Transferencia','Mercado Pago','Tarjeta','QR'];
-const ENTREGA_TIPOS = ['Retira','Transporte'];
+const ENTREGA_TIPOS = ['Retira','Entrega a domicilio'];
 const ESTADOS_PEDIDO = [
   'Confirmado sin seña',
   'Confirmado con seña',
@@ -34,11 +34,11 @@ const ESTADO_COLOR = {
   'Entregado':'success',
   'Cancelado':'danger'
 };
-const CATEGORIAS_EGRESO = ['Corte láser','Pintura tercerizada','Soldadura tercerizada','Transporte','Publicidad y CM','Insumos de material','Comisión por venta','Otro'];
+const CATEGORIAS_EGRESO = ['Corte láser','Pintura tercerizada','Soldadura tercerizada','Entrega a domicilio','Publicidad y CM','Insumos de material','Comisión por venta','Contabilidad','Otro'];
 const CATEGORIAS_INGRESO = ['Venta - Seña','Venta - Saldo','Venta - Pago total','Otro ingreso'];
-const STOCK_CATEGORIAS = ['Herrería (varillas / chapas)','Pintura','Discos de corte','Bulones y tornillería','Electrodos','EPP (guantes, etc.)','Otros'];
-const STOCK_UNIDADES = ['unidad','kg','m','litro','caja','par'];
-const PRODUCTOS_TIPO = ['Fogonero redondo','Fogonero cuadrado','Fogonero rectangular','Fogonero hexagonal','Fogonero a medida','Otro'];
+const STOCK_CATEGORIAS = ['Herrería (varillas)','Pintura','Discos de corte','Discos flapper','Bulones y tornillos','Electrodos','EPP (guantes, lentes, etc.)','Otros'];
+const STOCK_UNIDADES = ['unidad','kg','m','litro','caja','otro'];
+const PRODUCTOS_TIPO = ['Fogonero redondo','Fogonero cuadrado','Fogonero a medida','Otro'];
 
 const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
@@ -89,7 +89,7 @@ function seedDB(){
       id: uid('ped'), cliente:'Julieta Cáceres', telefono:'3512223344', localidad:'Villa Allende, Córdoba', instagram:'@juliceres',
       fechaPedido: back(10), fechaEntrega: back(1), producto:'Fogonero cuadrado', medidas:'60x60 cm', color:'Negro forja',
       accesorios:['Parrilla','Ganchos','Utensilios largos'], precio:210000, seña:100000, saldo:110000, formaPago:'Mercado Pago',
-      entrega:'Transporte', direccion:'Belgrano 145, Villa Allende', estado:'Listo para entrega', observaciones:''
+      entrega:'Entrega a domicilio', direccion:'Belgrano 145, Villa Allende', estado:'Listo para entrega', observaciones:''
     },
     {
       id: uid('ped'), cliente:'Franco Bertolino', telefono:'3517778899', localidad:'La Calera, Córdoba', instagram:'',
@@ -121,7 +121,7 @@ function seedDB(){
     {id:uid('cj'), fecha:back(7), tipo:'egreso', categoria:'Publicidad y CM', descripcion:'Pauta Instagram + edición mensual', monto:35000, formaPago:'Transferencia'},
     {id:uid('cj'), fecha:back(6), tipo:'ingreso', categoria:'Venta - Pago total', descripcion:'Pago total fogonero hexagonal — Franco Bertolino', monto:245000, formaPago:'Efectivo'},
     {id:uid('cj'), fecha:back(5), tipo:'egreso', categoria:'Soldadura tercerizada', descripcion:'Soldadura de patas y refuerzos', monto:28000, formaPago:'Efectivo'},
-    {id:uid('cj'), fecha:back(4), tipo:'egreso', categoria:'Transporte', descripcion:'Flete entrega Villa Allende', monto:15000, formaPago:'Efectivo'},
+    {id:uid('cj'), fecha:back(4), tipo:'egreso', categoria:'Entrega a domicilio', descripcion:'Flete entrega Villa Allende', monto:15000, formaPago:'Efectivo'},
     {id:uid('cj'), fecha:back(1), tipo:'egreso', categoria:'Insumos de material', descripcion:'Discos de corte y electrodos', monto:22000, formaPago:'Efectivo'},
     {id:uid('cj'), fecha:back(45), tipo:'ingreso', categoria:'Venta - Pago total', descripcion:'Fogonero redondo — cliente ocasional', monto:150000, formaPago:'Efectivo'},
     {id:uid('cj'), fecha:back(40), tipo:'egreso', categoria:'Comisión por venta', descripcion:'Comisión venta por referido', monto:15000, formaPago:'Transferencia'},
